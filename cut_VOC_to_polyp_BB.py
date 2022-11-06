@@ -304,9 +304,10 @@ def analyze_voc_sizes( data_path ):
 
 
 if __name__ == '__main__':
-    # cut_voc_to_bb(data_path="D:\\Master_Daten\\KUMC_PolypsSet\\PolypsSet\\val2019",
-    #               dest_path="D:\\Master_Daten\\KUMC_PolypsSet\\PolypsSet_cut\\val2019")
+    cut_voc_to_given_size(data_path="D:\\Master_Daten\\KUMC_PolypsSet\\PolypsSet\\test2019",
+                          dest_path="D:\\Master_Daten\\KUMC_PolypsSet\\PolypsSet_cut\\test2019",
+                          target_width=300, target_height=300)
 
-    analyze_voc_sizes("D:\\Master_Daten\\KUMC_PolypsSet\\PolypsSet\\val2019")
+    # analyze_voc_sizes("D:\\Master_Daten\\KUMC_PolypsSet\\PolypsSet\\val2019")
     # get_unique_paths("KUMC_PolypsSet/PolypsSet/train2019")
     exit(0)
