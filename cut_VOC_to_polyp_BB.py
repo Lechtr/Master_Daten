@@ -121,9 +121,116 @@ def cut_voc_to_bb( data_path, dest_path ):
 
 
 
+
+# utility function
+def pad_image(pil_img, top, right, bottom, left, color):
+    width, height = pil_img.size
+    new_width = width + right + left
+    new_height = height + top + bottom
+    result = Image.new(pil_img.mode, (new_width, new_height), color)
+    result.paste(pil_img, (left, top))
+    return result
+
+
+# converts data to a uniform given size
+# will take the actual polyp bounding box and either pad to size or resize smaller to fit
+def cut_voc_to_given_size( data_path, dest_path, target_width, target_height ):
+    # create destination dir
+    Path(dest_path).mkdir(parents=True, exist_ok=True)
+
+    annotations_path = os.path.join(data_path, "Annotation")
+    images_path = os.path.join(data_path, "Image")
+
+    # collect video dir names
+    video_labels = [f.path for f in os.scandir(annotations_path) if f.is_dir()]
+
+    # loop video dirs
+    for video_dir in video_labels:
+
+        # loop through each annotation file/frame of this dir
+        annotation_files = [f.path for f in os.scandir(video_dir) if f.is_file()]
+        for annotation_file in annotation_files:
+
+            # check for multiple BBs or if no BB
+            no_bb = False
+            with open(annotation_file) as f:
+                lines = f.readlines()
+                number_bb_tags = len([line for line in lines if"bndbox" in line])
+
+                if number_bb_tags == 0:
+                    no_bb = True
+                elif number_bb_tags != 2:
+                    print("WARNING: multiple bounding boxes in:", annotation_file)
+                    print("this situation is not handled")
+                    print("number_bb_tags:", number_bb_tags)
+
+            # skip files with no polyp
+            if no_bb:
+                continue
+
+            # get BB coordinates
+            root = ET.parse(annotation_file).getroot()
+            xmin = int(root.find('object/bndbox/xmin').text)
+            ymin = int(root.find('object/bndbox/ymin').text)
+            xmax = int(root.find('object/bndbox/xmax').text)
+            ymax = int(root.find('object/bndbox/ymax').text)
+            bb_width = xmax-xmin
+            bb_height = ymax-ymin
+
+            # get corresponding image
+            image_file = Path(annotation_file.replace(annotations_path, images_path).replace(".xml", ".jpg"))
+            if not image_file.is_file():
+                print("Image file is missing:", image_file)
+                continue
+            image = Image.open(image_file)
+
+            # get dest path for this image
+            index = image_file.parts.index('Image')
+            image_dest_path = Path(dest_path).joinpath(*image_file.parts[index:])
+            # create path
+            Path(image_dest_path.parent).mkdir(parents=True, exist_ok=True)
+
+
+            # cut image and save
+            image = image.crop((xmin, ymin, xmax, ymax))
+
+            # is BB bigger than target and has to be resized?
+            if bb_width > target_width or bb_height > target_height:
+                # resize with keeping aspect ratio
+                image.thumbnail(size=(target_width, target_height), reducing_gap=3)
+
+            # is BB smaller than target and has to be padded?
+            if image.width < target_width or image.height < target_height:
+                top     = int(np.floor((target_height - image.height)/2.0))
+                right   = int(np.floor((target_width - image.width)/2.0))
+                bottom  = int(np.ceil((target_height - image.height)/2.0))
+                left    = int(np.ceil((target_width - image.width)/2.0))
+
+                image = pad_image(image, top, right, bottom, left, color=(0, 0, 0))
+
+
+            image.save(image_dest_path)
+
+    print("done with images")
+
+    # copy whole annotations unchanged
+    # since only classification value is of relevance
+    annotations_path = Path(annotations_path)
+    index = annotations_path.parts.index('Annotation')
+    annotations_dest_path = Path(dest_path).joinpath(*annotations_path.parts[index:])
+    shutil.copytree(annotations_path, annotations_dest_path)
+    print("copied annotations")
+
+
+
+
+
+
+
+
 # find all unique directory given in the "path"-parameter of all xmls
 # useful to maybe use the "train"-data from KUMC
-def get_unique_paths( data_path):
+def get_unique_paths( data_path ):
     xml_files = [f for f in glob.glob(data_path + "/**/*.xml", recursive=True)]
 
     print("glob done")
@@ -131,6 +238,12 @@ def get_unique_paths( data_path):
     paths = sorted({os.path.dirname(root.find('path').text) for xml in xml_files if (root := ET.parse(xml).getroot())})
 
     print(paths)
+
+
+
+
+
+
 
 
 
