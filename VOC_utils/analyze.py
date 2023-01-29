@@ -145,6 +145,7 @@ def list_polyp_labels( data_path ):
     print("glob done")
 
     # count unique image sizes from the xml given width and height
+    # replace with regex?
     img_labels_xml = [root.find('object/name').text for xml in xml_files if (root := ET.parse(xml).getroot())]
 
     print("Polyp labels : count")
@@ -189,5 +190,5 @@ if __name__ == '__main__':
 
     # analyze_voc_sizes("KUMC/")
     # list_unique_paths("KUMC/")
-    list_polyp_labels("KUMC/")
+    list_polyp_labels("SUN/")
     exit(0)
