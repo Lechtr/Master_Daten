@@ -7,6 +7,9 @@ import xml.etree.ElementTree as ET
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import Counter
+import re
+
+from timeit import default_timer as timer
 
 
 def list_unique_paths( data_path ):
@@ -106,11 +109,11 @@ def analyze_voc_sizes( data_path ):
 
     # 1D hist
     _ = plt.hist(polyp_sizes, bins='auto')  # arguments are passed to np.histogram
-    plt.title("Polyp sizes in KUMC")
+    plt.title("Polyp sizes in SUN")
     plt.show()
 
     # 2D hist
-    plt.title("Polyp sizes in KUMC")
+    plt.title("Polyp sizes in SUN")
     H, xedges, yedges = np.histogram2d(polyp_sizes[:, 0], polyp_sizes[:, 1], bins=50)
     # Histogram does not follow Cartesian convention (see Notes),
     # therefore transpose H for visualization purposes.
@@ -137,7 +140,7 @@ def list_polyp_labels( data_path ):
     :param data_path:
     :return:
     """
-
+    start = timer()
     ############
     # analyze the image label annotations
     xml_files = [f for f in glob.glob(data_path + "/**/*.xml", recursive=True)]
@@ -145,7 +148,8 @@ def list_polyp_labels( data_path ):
     print("glob done")
 
     # count unique image sizes from the xml given width and height
-    # replace with regex?
+    # pattern = re.compile(r'<name>(.*)</name>')
+    # img_labels_xml = [re.search(pattern, f.read()).group(1) for xml in xml_files if (f := open(xml, 'r'))]
     img_labels_xml = [root.find('object/name').text for xml in xml_files if (root := ET.parse(xml).getroot())]
 
     print("Polyp labels : count")
@@ -153,6 +157,11 @@ def list_polyp_labels( data_path ):
         print(size[0], ": ", size[1])
 
     print()
+
+    end = timer()
+    print("done:")
+    print(end - start)
+    start = timer()
 
 
     ############
@@ -169,6 +178,7 @@ def list_polyp_labels( data_path ):
         seq_xml_files = [f for f in glob.glob(video_dir + "/**/*.xml", recursive=True)]
 
         # count unique image sizes from the xml given width and height
+        # img_labels_xml = [re.search(pattern, f.read()).group(1) for xml in seq_xml_files if (f := open(xml, 'r'))]
         img_labels_xml = [root.find('object/name').text for xml in seq_xml_files if (root := ET.parse(xml).getroot())]
 
         if len(Counter(img_labels_xml).keys()) > 1:
@@ -184,11 +194,16 @@ def list_polyp_labels( data_path ):
     for size in zip(Counter(sequence_labels).keys(), Counter(sequence_labels).values()):
         print(size[0], ": ", size[1])
 
+    end = timer()
+    print("done:")
+    print(end - start)
+
+
 
 if __name__ == '__main__':
     os.chdir("D:\Master_Daten")
 
-    # analyze_voc_sizes("KUMC/")
-    # list_unique_paths("KUMC/")
-    list_polyp_labels("SUN/")
+    analyze_voc_sizes("SUN/")
+    # list_unique_paths("SUN/")
+    # list_polyp_labels("SUN/")
     exit(0)
