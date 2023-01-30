@@ -15,9 +15,9 @@ def remove_files_without_image_or_annotation( data_path ):
     :param data_path: dir with children "Annotation" and "Image"; ex.: "D:\\Master_Daten\\KUMC_PolypsSet\\PolypsSet\\val2019"
     """
 
-    xml_files = [f for f in glob.glob(data_path + "/**/*.xml", recursive=True)]
-    image_files = [f for f in glob.glob(data_path + "/**/*.jpg", recursive=True)]
-    image_files.extend([f for f in glob.glob(data_path + "/**/*.png", recursive=True)])
+    xml_files = [f for f in glob.glob(data_path + "Annotation/**/*.xml", recursive=True)]
+    image_files = [f for f in glob.glob(data_path + "Image/**/*.jpg", recursive=True)]
+    image_files.extend([f for f in glob.glob(data_path + "Image/**/*.png", recursive=True)])
     print("glob done")
 
     for xml in xml_files:
@@ -49,7 +49,7 @@ def remove_files_without_polyp( data_path ):
     :return:
     """
 
-    xml_files = [f for f in glob.glob(data_path + "/**/*.xml", recursive=True)]
+    xml_files = [f for f in glob.glob(data_path + "Annotation/**/*.xml", recursive=True)]
 
     xml_without_polyps = [xml for xml in xml_files if (ET.parse(xml).getroot().find('object') is None)]
 
@@ -62,14 +62,14 @@ def remove_files_without_polyp( data_path ):
         if os.path.isfile(jpg_path):
             print("remove: ", xml)
             print("remove: ", jpg_path)
-            os.remove(xml)
-            os.remove(jpg_path)
+            # os.remove(xml)
+            # os.remove(jpg_path)
 
         elif os.path.isfile(png_path):
             print("remove: ", xml)
             print("remove: ", png_path)
-            os.remove(xml)
-            os.remove(png_path)
+            # os.remove(xml)
+            # os.remove(png_path)
 
 
 
@@ -78,6 +78,6 @@ def remove_files_without_polyp( data_path ):
 if __name__ == '__main__':
     os.chdir("D:\Master_Daten")
 
-    # remove_files_without_image_or_annotation("KUMC/")
-    remove_files_without_polyp("KUMC/")
+    remove_files_without_image_or_annotation("SUN/")
+    # remove_files_without_polyp("SUN/")
     exit(0)
