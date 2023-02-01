@@ -78,6 +78,6 @@ def remove_files_without_polyp( data_path ):
 if __name__ == '__main__':
     os.chdir("D:\Master_Daten")
 
-    remove_files_without_image_or_annotation("SUN/")
-    # remove_files_without_polyp("SUN/")
+    # remove_files_without_image_or_annotation("KUMC_PolypsSet/")
+    remove_files_without_polyp("KUMC_PolypsSet/")
     exit(0)

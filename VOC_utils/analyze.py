@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import Counter
 import re
+import csv
 
 from timeit import default_timer as timer
 
@@ -26,6 +27,40 @@ def list_unique_paths( data_path ):
 
     print(paths)
 
+
+def list__paths_and_files( data_path ):
+    """
+    find all directories and files given in the "path"-parameter of all xmls
+    writes result to a csv in the same dir
+    useful to maybe use the "train"-data from KUMC
+    :param data_path: dir with children "Annotation" and "Image"; ex.: "D:\\Master_Daten\\KUMC_PolypsSet\\PolypsSet\\val2019"
+    """
+    xml_files = [f for f in glob.glob(data_path + "/**/*.xml", recursive=True)]
+
+    print("glob done")
+
+    start = timer()
+
+    # paths = sorted([(os.path.dirname(root.find('path').text), os.path.basename(root.find('path').text)) for xml in xml_files if (root := ET.parse(xml).getroot())])
+    paths = sorted(
+        [[root.find('path').text, int(os.path.basename(root.find('filename').text).split(".")[0].replace("adenoma_", ""))] for xml in xml_files if
+         (root := ET.parse(xml).getroot())])
+
+    for path in paths:
+        if "adenoma" not in path[0]:
+            path[0] = os.path.dirname(path[0])
+
+    end = timer()
+    print("done:")
+    print(end - start)
+
+    print("save csv to: ", os.path.join(data_path, "unique_path_files.csv"))
+    with open(os.path.join(data_path, "unique_path_files.csv"), 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',',
+                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        for path in paths:
+            writer.writerow(path)
+    print(paths)
 
 
 
@@ -203,7 +238,8 @@ def list_polyp_labels( data_path ):
 if __name__ == '__main__':
     os.chdir("D:\Master_Daten")
 
-    analyze_voc_sizes("SUN/")
-    # list_unique_paths("SUN/")
+    # analyze_voc_sizes("SUN/")
+    # list_unique_paths("KUMC_PolypsSet/PolypsSet/train2019/Annotation")
+    list__paths_and_files("KUMC_PolypsSet/PolypsSet/train2019/")
     # list_polyp_labels("SUN/")
     exit(0)
