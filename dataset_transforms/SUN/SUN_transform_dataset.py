@@ -62,7 +62,7 @@ def resize_images_and_transform_labels(dir_positive = "D:\\Master_Daten\\sundata
     # directory that holds the labels
     dir_label = os.path.join(dir_positive, "annotation_txt")
 
-    # empty dirs of old images/labels
+    # empty dirs of dataset_transforms images/labels
     dest_pos = os.path.join(destination_dir, "positive")
     dest_neg = os.path.join(destination_dir, "negative")
     shutil.rmtree(dest_pos, ignore_errors=True)
@@ -235,7 +235,7 @@ def split_training_validation(dir_data="D:\\Master_Daten\\sundatabase_resized_no
     dest_labels_val = rreplace(dest_images_val, "images", "labels")
 
 
-    # empty dirs of old images/labels
+    # empty dirs of dataset_transforms images/labels
     shutil.rmtree(dest_images_train, ignore_errors=True)
     shutil.rmtree(dest_images_val, ignore_errors=True)
     shutil.rmtree(dest_labels_train, ignore_errors=True)
