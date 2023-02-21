@@ -144,11 +144,11 @@ def analyze_voc_sizes( data_path ):
 
     # 1D hist
     _ = plt.hist(polyp_sizes, bins='auto')  # arguments are passed to np.histogram
-    plt.title("Polyp sizes in SUN")
+    plt.title("Polyp sizes in KUMC")
     plt.show()
 
     # 2D hist
-    plt.title("Polyp sizes in SUN")
+    plt.title("Polyp sizes in KUMC")
     H, xedges, yedges = np.histogram2d(polyp_sizes[:, 0], polyp_sizes[:, 1], bins=50)
     # Histogram does not follow Cartesian convention (see Notes),
     # therefore transpose H for visualization purposes.
@@ -238,8 +238,8 @@ def list_polyp_labels( data_path ):
 if __name__ == '__main__':
     os.chdir("D:\Master_Daten")
 
-    # analyze_voc_sizes("SUN/")
+    analyze_voc_sizes("KUMC_PolypsSet/")
     # list_unique_paths("KUMC_PolypsSet/PolypsSet/train2019/Annotation")
-    list__paths_and_files("KUMC_PolypsSet/PolypsSet/train2019/")
-    # list_polyp_labels("SUN/")
+    # list__paths_and_files("KUMC_PolypsSet/PolypsSet/train2019/")
+    # list_polyp_labels("KUMC_PolypsSet/")
     exit(0)

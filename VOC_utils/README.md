@@ -1,6 +1,5 @@
 The utility files in this folder assume that the files are in the following file structure.
-
-The folder, filename and path tag of VOC annotations are ignored, since they contain unreliable information
+They are used to process the datasets after they have been converted to the VOC-Format
 
 Assumes:
 
